@@ -6,9 +6,21 @@ import XCTest
 import FeedStoreChallenge
 
 class CodableFeedStore: FeedStore {
+    private struct Cache: Codable {
+        let feed: [LocalFeedImage]
+        let timestamp: Date
+    }
+    
+    private let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
+    
     func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
     
-    func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {}
+    func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        let encoder = JSONEncoder()
+        let encodedData = try! encoder.encode(Cache(feed: feed, timestamp: timestamp))
+        try! encodedData.write(to: storeURL)
+        completion(nil)
+    }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
         completion(.empty)
@@ -16,6 +28,20 @@ class CodableFeedStore: FeedStore {
 }
 
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
+    
+    override func setUp() {
+        super.setUp()
+        
+        let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
+        try? FileManager.default.removeItem(at: storeURL)
+    }
+    
+    override func tearDown() {
+        let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
+        try? FileManager.default.removeItem(at: storeURL)
+        
+        super.tearDown()
+    }
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
 		let sut = makeSUT()
@@ -42,9 +68,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_insert_deliversNoErrorOnEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
 	}
 
 	func test_insert_deliversNoErrorOnNonEmptyCache() {
