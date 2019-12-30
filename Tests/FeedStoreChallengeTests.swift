@@ -187,6 +187,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     private func writeInvalidData(to storeURL: URL) {
         try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
     }
+    
+    private func invalidStoreURL() -> URL {
+        return URL(string: "invalid://store-url")!
+    }
 }
 
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
@@ -214,15 +218,15 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
     func test_insert_deliversErrorOnInsertionError() {
-        let invalidStoreURL = URL(string: "invalid://store-url")
-        let sut = makeSUT(storeURL: invalidStoreURL)
+        let invalidURL = invalidStoreURL()
+        let sut = makeSUT(storeURL: invalidURL)
 
         assertThatInsertDeliversErrorOnInsertionError(on: sut)
     }
 
     func test_insert_hasNoSideEffectsOnInsertionError() {
-        let invalidStoreURL = URL(string: "invalid://store-url")
-        let sut = makeSUT(storeURL: invalidStoreURL)
+        let invalidURL = invalidStoreURL()
+        let sut = makeSUT(storeURL: invalidURL)
 
         assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
     }
