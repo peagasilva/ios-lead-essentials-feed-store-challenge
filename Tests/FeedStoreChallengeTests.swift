@@ -151,9 +151,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	// MARK: - Helpers
 	
-	private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
-        let storeURL = self.testSpecificStoreURL()
-        let sut = CodableFeedStore(storeURL: storeURL)
+    private func makeSUT(storeURL: URL? = nil, file: StaticString = #file, line: UInt = #line) -> FeedStore {
+        let url = storeURL ?? testSpecificStoreURL()
+        let sut = CodableFeedStore(storeURL: url)
         trackMemoryLeaksFor(sut, file: file, line: line)
 		return sut
 	}
@@ -184,9 +184,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
     func test_retrieve_deliversFailureOnRetrievalError() {
-        let sut = makeSUT()
+        let storeURL = testSpecificStoreURL()
+        let sut = makeSUT(storeURL: storeURL)
         
-        try! "invalid data".write(to: testSpecificStoreURL(), atomically: false, encoding: .utf8)
+        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
 
         assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
     }
