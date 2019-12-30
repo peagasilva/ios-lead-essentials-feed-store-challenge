@@ -45,8 +45,12 @@ class CodableFeedStore: FeedStore {
             return completion(nil)
         }
         
-        try! fileManager.removeItem(at: storeURL)
-        completion(nil)
+        do {
+            try fileManager.removeItem(at: storeURL)
+            completion(nil)
+        } catch {
+            completion(error)
+        }
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
@@ -244,9 +248,10 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 
     func test_delete_deliversErrorOnDeletionError() {
-//        let sut = makeSUT()
-//
-//        assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+        let noDeletionPermissionURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let sut = makeSUT(storeURL: noDeletionPermissionURL)
+
+        assertThatDeleteDeliversErrorOnDeletionError(on: sut)
     }
 
     func test_delete_hasNoSideEffectsOnDeletionError() {
