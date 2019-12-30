@@ -6,12 +6,6 @@ import XCTest
 import FeedStoreChallenge
 
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
-	
-//
-//   We recommend you to implement one test at a time.
-//   Uncomment the test implementations one by one.
-// 	 Follow the process: Make the test pass, commit, and move to the next one.
-//
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
 //		let sut = makeSUT()
@@ -85,63 +79,57 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 //		assertThatSideEffectsRunSerially(on: sut)
 	}
 	
-	// - MARK: Helpers
+	// MARK: - Helpers
 	
 	private func makeSUT() -> FeedStore {
 		fatalError("Must be implemented")
 	}
-	
 }
 
-//
-// Uncomment the following tests if your implementation has failable operations.
-// Otherwise, delete the commented out code!
-//
+extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
-//extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+    func test_retrieve_deliversFailureOnRetrievalError() {
+//        let sut = makeSUT()
 //
-//	func test_retrieve_deliversFailureOnRetrievalError() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
-//	}
-//
-//	func test_retrieve_hasNoSideEffectsOnFailure() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-//	}
-//
-//}
+//        assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+    }
 
-//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+    func test_retrieve_hasNoSideEffectsOnFailure() {
+//        let sut = makeSUT()
 //
-//	func test_insert_deliversErrorOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
-//	}
-//
-//	func test_insert_hasNoSideEffectsOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
-//	}
-//
-//}
+//        assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+    }
 
-//extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+}
+
+extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+
+    func test_insert_deliversErrorOnInsertionError() {
+//        let sut = makeSUT()
 //
-//	func test_delete_deliversErrorOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
-//	}
+//        assertThatInsertDeliversErrorOnInsertionError(on: sut)
+    }
+
+    func test_insert_hasNoSideEffectsOnInsertionError() {
+//        let sut = makeSUT()
 //
-//	func test_delete_hasNoSideEffectsOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
-//	}
+//        assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
+    }
+
+}
+
+extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+
+    func test_delete_deliversErrorOnDeletionError() {
+//        let sut = makeSUT()
 //
-//}
+//        assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+    }
+
+    func test_delete_hasNoSideEffectsOnDeletionError() {
+//        let sut = makeSUT()
+//
+//        assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
+    }
+
+}
