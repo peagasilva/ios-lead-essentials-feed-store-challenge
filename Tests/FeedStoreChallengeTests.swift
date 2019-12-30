@@ -179,6 +179,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     private func undoStoreState() {
         deleteStoreArtifacts()
     }
+    
+    private func writeInvalidData(to storeURL: URL) {
+        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+    }
 }
 
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
@@ -187,7 +191,7 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
         let storeURL = testSpecificStoreURL()
         let sut = makeSUT(storeURL: storeURL)
         
-        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+        writeInvalidData(to: storeURL)
 
         assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
     }
@@ -196,7 +200,7 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
         let storeURL = testSpecificStoreURL()
         let sut = makeSUT(storeURL: storeURL)
         
-        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+        writeInvalidData(to: storeURL)
 
         assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
     }
