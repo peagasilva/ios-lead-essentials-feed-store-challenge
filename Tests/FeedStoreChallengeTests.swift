@@ -39,7 +39,9 @@ class CodableFeedStore: FeedStore {
         self.storeURL = storeURL
     }
     
-    func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
+    func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+        completion(nil)
+    }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         do {
@@ -124,9 +126,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_delete_deliversNoErrorOnEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatDeleteDeliversNoErrorOnEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatDeleteDeliversNoErrorOnEmptyCache(on: sut)
 	}
 
 	func test_delete_hasNoSideEffectsOnEmptyCache() {
