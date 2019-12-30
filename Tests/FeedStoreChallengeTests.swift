@@ -42,10 +42,14 @@ class CodableFeedStore: FeedStore {
     func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        let encoder = JSONEncoder()
-        let encodedData = try! encoder.encode(Cache(feed: feed.map(CodableFeedImage.init), timestamp: timestamp))
-        try! encodedData.write(to: storeURL)
-        completion(nil)
+        do {
+            let encoder = JSONEncoder()
+            let encodedData = try encoder.encode(Cache(feed: feed.map(CodableFeedImage.init), timestamp: timestamp))
+            try encodedData.write(to: storeURL)
+            completion(nil)
+        } catch {
+            completion(error)
+        }
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
@@ -210,9 +214,10 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
     func test_insert_deliversErrorOnInsertionError() {
-//        let sut = makeSUT()
-//
-//        assertThatInsertDeliversErrorOnInsertionError(on: sut)
+        let invalidStoreURL = URL(string: "invalid://store-url")
+        let sut = makeSUT(storeURL: invalidStoreURL)
+
+        assertThatInsertDeliversErrorOnInsertionError(on: sut)
     }
 
     func test_insert_hasNoSideEffectsOnInsertionError() {
