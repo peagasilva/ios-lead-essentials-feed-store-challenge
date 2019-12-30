@@ -246,19 +246,23 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 }
 
 extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
-
     func test_delete_deliversErrorOnDeletionError() {
-        let noDeletionPermissionURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let noDeletionPermissionURL = cachesDirectoryURL()
         let sut = makeSUT(storeURL: noDeletionPermissionURL)
 
         assertThatDeleteDeliversErrorOnDeletionError(on: sut)
     }
 
     func test_delete_hasNoSideEffectsOnDeletionError() {
-        let noDeletionPermissionURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let noDeletionPermissionURL = cachesDirectoryURL()
         let sut = makeSUT(storeURL: noDeletionPermissionURL)
 
         assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
     }
-
+    
+    // MARK: - Helpers
+    
+    private func cachesDirectoryURL() -> URL {
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    }
 }
