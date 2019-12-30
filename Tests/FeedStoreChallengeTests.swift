@@ -65,13 +65,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     override func setUp() {
         super.setUp()
         
-        let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
-        try? FileManager.default.removeItem(at: storeURL)
+        try? FileManager.default.removeItem(at: storeURL())
     }
     
     override func tearDown() {
-        let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
-        try? FileManager.default.removeItem(at: storeURL)
+        try? FileManager.default.removeItem(at: storeURL())
         
         super.tearDown()
     }
@@ -151,7 +149,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// MARK: - Helpers
 	
 	private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
-        let storeURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
+        let storeURL = self.storeURL()
         let sut = CodableFeedStore(storeURL: storeURL)
         trackMemoryLeaksFor(sut, file: file, line: line)
 		return sut
@@ -161,6 +159,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
         addTeardownBlock { [weak instance] in
             XCTAssertNil(instance, "Instance should have been deallocated. Potenteial memory leak.", file: file, line: line)
         }
+    }
+    
+    private func storeURL() -> URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
     }
 }
 
