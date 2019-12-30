@@ -53,10 +53,13 @@ class CodableFeedStore: FeedStore {
             return completion(.empty)
         }
         
-        let decoder = JSONDecoder()
-        let cache = try! decoder.decode(Cache.self, from: storedData)
-        
-        completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+        do {
+            let decoder = JSONDecoder()
+            let cache = try decoder.decode(Cache.self, from: storedData)
+            completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+        } catch {
+            completion(.failure(error))
+        }
     }
 }
 
@@ -181,9 +184,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
     func test_retrieve_deliversFailureOnRetrievalError() {
-//        let sut = makeSUT()
-//
-//        assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+        let sut = makeSUT()
+        
+        try! "invalid data".write(to: testSpecificStoreURL(), atomically: false, encoding: .utf8)
+
+        assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
     }
 
     func test_retrieve_hasNoSideEffectsOnFailure() {
