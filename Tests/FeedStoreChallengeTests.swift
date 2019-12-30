@@ -65,11 +65,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     override func setUp() {
         super.setUp()
         
-        try? FileManager.default.removeItem(at: storeURL())
+        try? FileManager.default.removeItem(at: testSpecificStoreURL())
     }
     
     override func tearDown() {
-        try? FileManager.default.removeItem(at: storeURL())
+        try? FileManager.default.removeItem(at: testSpecificStoreURL())
         
         super.tearDown()
     }
@@ -149,7 +149,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// MARK: - Helpers
 	
 	private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
-        let storeURL = self.storeURL()
+        let storeURL = self.testSpecificStoreURL()
         let sut = CodableFeedStore(storeURL: storeURL)
         trackMemoryLeaksFor(sut, file: file, line: line)
 		return sut
@@ -161,8 +161,8 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
         }
     }
     
-    private func storeURL() -> URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("image-feed.store")
+    private func testSpecificStoreURL() -> URL {
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
     }
 }
 
