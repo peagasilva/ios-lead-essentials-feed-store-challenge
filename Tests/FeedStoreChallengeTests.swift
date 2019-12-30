@@ -195,18 +195,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     private func undoStoreState() {
         deleteStoreArtifacts()
     }
-    
-    private func writeInvalidData(to storeURL: URL) {
-        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
-    }
-    
-    private func invalidStoreURL() -> URL {
-        return URL(string: "invalid://store-url")!
-    }
 }
 
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
-
+    
     func test_retrieve_deliversFailureOnRetrievalError() {
         let storeURL = testSpecificStoreURL()
         let sut = makeSUT(storeURL: storeURL)
@@ -224,11 +216,16 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
         assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
     }
-
+    
+    // MARK: - FeedStoreChallengeTests Helpers
+    
+    private func writeInvalidData(to storeURL: URL) {
+        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+    }
 }
 
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
-
+    
     func test_insert_deliversErrorOnInsertionError() {
         let invalidURL = invalidStoreURL()
         let sut = makeSUT(storeURL: invalidURL)
@@ -243,9 +240,15 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
         assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
     }
 
+    // MARK: - FeedStoreChallengeTests Helpers
+    
+    private func invalidStoreURL() -> URL {
+        return URL(string: "invalid://store-url")!
+    }
 }
 
 extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+    
     func test_delete_deliversErrorOnDeletionError() {
         let noDeletionPermissionURL = cachesDirectoryURL()
         let sut = makeSUT(storeURL: noDeletionPermissionURL)
@@ -260,7 +263,7 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
         assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
     }
     
-    // MARK: - Helpers
+    // MARK: - FeedStoreChallengeTests Helpers
     
     private func cachesDirectoryURL() -> URL {
         return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
