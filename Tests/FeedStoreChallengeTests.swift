@@ -95,9 +95,10 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	// MARK: - Helpers
 	
-	private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
+    private func makeSUT(url: URL? = nil, file: StaticString = #file, line: UInt = #line) -> FeedStore {
+        let storeURL = url ?? feedStoreURL
         let feedStoreBundle = Bundle(for: CoreDataFeedStore.self)
-        let sut = try! CoreDataFeedStore(url: feedStoreURL, bundle: feedStoreBundle)
+        let sut = try! CoreDataFeedStore(url: storeURL, bundle: feedStoreBundle)
         trackMemoryLeaksFor(sut, file: file, line: line)
         return sut
     }
@@ -111,7 +112,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     private func testSpecificStoreURL() -> URL {
         return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
     }
-	
 }
 
 //
@@ -119,21 +119,24 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 // Otherwise, delete the commented out code!
 //
 
-//extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+
+	func test_retrieve_deliversFailureOnRetrievalError() {
+        let url = feedStoreURL
+        let sut = makeSUT(url: url)
+        
+        try! "invalid data".write(to: url, atomically: false, encoding: .utf8)
+
+		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+	}
+
+	func test_retrieve_hasNoSideEffectsOnFailure() {
+//		let sut = makeSUT()
 //
-//	func test_retrieve_deliversFailureOnRetrievalError() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
-//	}
-//
-//	func test_retrieve_hasNoSideEffectsOnFailure() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-//	}
-//
-//}
+//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+	}
+
+}
 
 //extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 //
