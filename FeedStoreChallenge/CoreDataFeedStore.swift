@@ -11,7 +11,13 @@ import CoreData
 
 public final class CoreDataFeedStore: FeedStore {
     
-    public init() {}
+    private let persistentContainer: NSPersistentContainer
+    private let context: NSManagedObjectContext
+
+    public init(bundle: Bundle = .main) throws {
+        persistentContainer = try NSPersistentContainer.load(modelName: "CoreDataFeedStore", in: bundle)
+        context = persistentContainer.newBackgroundContext()
+    }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
     
@@ -21,6 +27,40 @@ public final class CoreDataFeedStore: FeedStore {
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
         completion(.empty)
+    }
+}
+
+// MARK: - NSPersistentContainer Extension
+
+extension NSPersistentContainer {
+    enum LoadError: Swift.Error {
+        case didNotFindModel
+        case didFailToLoadPersistentStores(Swift.Error)
+    }
+    
+    static func load(modelName name: String, in bundle: Bundle) throws -> NSPersistentContainer {
+        guard let model = NSManagedObjectModel.with(name: name, in: bundle) else {
+            throw LoadError.didNotFindModel
+        }
+        
+        var loadError: Swift.Error?
+        
+        let persistentContainer = NSPersistentContainer(name: name, managedObjectModel: model)
+        persistentContainer.loadPersistentStores { (_, error) in
+            loadError = error
+        }
+        
+        try loadError.map { throw LoadError.didFailToLoadPersistentStores($0) }
+        
+        return persistentContainer
+    }
+}
+
+// MARK: - NSManagedObjectModel
+
+extension NSManagedObjectModel {
+    static func with(name: String, in bundle: Bundle) -> NSManagedObjectModel? {
+        return bundle.url(forResource: name, withExtension: "momd").flatMap { NSManagedObjectModel(contentsOf: $0) }
     }
 }
 
