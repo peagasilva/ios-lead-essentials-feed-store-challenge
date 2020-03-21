@@ -150,9 +150,9 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 	}
 
 	func test_insert_hasNoSideEffectsOnInsertionError() {
-//		let sut = makeSUT()
-//
-//		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
+        let sut = FailableFeedStoreStub(failure: [.insert])
+
+		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
 	}
 
 }
@@ -180,15 +180,38 @@ private class FailableFeedStoreStub: FeedStore {
         case couldNotRetrieve
     }
     
-    func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        completion(Error.couldNotDelete)
+    struct Failure: OptionSet {
+        let rawValue: Int
+        
+        static let insert = Failure(rawValue: 1 << 1)
+        static let retrieve = Failure(rawValue: 1 << 2)
+        
+        init(rawValue: Int = 0) {
+            self.rawValue = rawValue
+        }
     }
     
+    let failure: Failure
+    
+    init(failure: Failure = [.insert, .retrieve]) {
+        self.failure = failure
+    }
+    
+    func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
+    
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        completion(Error.couldNotInsert)
+        if failure.contains(.insert) {
+            completion(Error.couldNotInsert)
+        } else {
+            completion(nil)
+        }
     }
     
     func retrieve(completion: @escaping RetrievalCompletion) {
-        completion(.failure(Error.couldNotRetrieve))
+        if failure.contains(.retrieve) {
+            completion(.failure(Error.couldNotRetrieve))
+        } else {
+            completion(.empty)
+        }
     }
 }
