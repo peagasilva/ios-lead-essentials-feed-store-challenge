@@ -6,12 +6,6 @@ import XCTest
 import FeedStoreChallenge
 
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
-	
-//
-//   We recommend you to implement one test at a time.
-//   Uncomment the test implementations one by one.
-// 	 Follow the process: Make the test pass, commit, and move to the next one.
-//
     
     private lazy var feedStoreURL = URL(fileURLWithPath: "dev/null")
     
@@ -114,11 +108,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     }
 }
 
-//
-// Uncomment the following tests if your implementation has failable operations.
-// Otherwise, delete the commented out code!
-//
-
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
 	func test_retrieve_deliversFailureOnRetrievalError() {
@@ -138,7 +127,6 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
 		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
 	}
-
 }
 
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
@@ -173,7 +161,7 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 
 }
 
-private class FeedStoreStub: FeedStore {
+private final class FeedStoreStub: FeedStore {
     enum Error: Swift.Error {
         case couldNotDelete
         case couldNotInsert
