@@ -141,21 +141,21 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
 }
 
-//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+
+	func test_insert_deliversErrorOnInsertionError() {
+        let sut = FailableFeedStoreStub()
+
+		assertThatInsertDeliversErrorOnInsertionError(on: sut)
+	}
+
+	func test_insert_hasNoSideEffectsOnInsertionError() {
+//		let sut = makeSUT()
 //
-//	func test_insert_deliversErrorOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
-//	}
-//
-//	func test_insert_hasNoSideEffectsOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
-//	}
-//
-//}
+//		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
+	}
+
+}
 
 //extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 //
@@ -172,3 +172,23 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 //	}
 //
 //}
+
+private class FailableFeedStoreStub: FeedStore {
+    enum Error: Swift.Error {
+        case couldNotDelete
+        case couldNotInsert
+        case couldNotRetrieve
+    }
+    
+    func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+        completion(Error.couldNotDelete)
+    }
+    
+    func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        completion(Error.couldNotInsert)
+    }
+    
+    func retrieve(completion: @escaping RetrievalCompletion) {
+        completion(.failure(Error.couldNotRetrieve))
+    }
+}
