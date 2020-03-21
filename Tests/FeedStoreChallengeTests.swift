@@ -157,21 +157,21 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
 }
 
-//extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+
+	func test_delete_deliversErrorOnDeletionError() {
+        let sut = FeedStoreStub(failure: [.delete])
+
+		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+	}
+
+	func test_delete_hasNoSideEffectsOnDeletionError() {
+//		let sut = makeSUT()
 //
-//	func test_delete_deliversErrorOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
-//	}
-//
-//	func test_delete_hasNoSideEffectsOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
-//	}
-//
-//}
+//		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
+	}
+
+}
 
 private class FeedStoreStub: FeedStore {
     enum Error: Swift.Error {
@@ -183,6 +183,7 @@ private class FeedStoreStub: FeedStore {
     struct Failure: OptionSet {
         let rawValue: Int
         
+        static let delete = Failure(rawValue: 1 << 0)
         static let insert = Failure(rawValue: 1 << 1)
         static let retrieve = Failure(rawValue: 1 << 2)
         
@@ -193,11 +194,17 @@ private class FeedStoreStub: FeedStore {
     
     let failure: Failure
     
-    init(failure: Failure = [.insert, .retrieve]) {
+    init(failure: Failure = [.delete, .insert, .retrieve]) {
         self.failure = failure
     }
     
-    func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
+    func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+        if failure.contains(.delete) {
+            completion(Error.couldNotDelete)
+        } else {
+            completion(nil)
+        }
+    }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         if failure.contains(.insert) {
