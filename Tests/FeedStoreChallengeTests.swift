@@ -132,7 +132,7 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
 	func test_insert_deliversErrorOnInsertionError() {
-        let sut = FeedStoreStub()
+        let sut = FeedStoreStub(failure: [.insert])
 
 		assertThatInsertDeliversErrorOnInsertionError(on: sut)
 	}
@@ -182,7 +182,7 @@ private final class FeedStoreStub: FeedStore {
     
     let failure: Failure
     
-    init(failure: Failure = [.delete, .insert, .retrieve]) {
+    init(failure: Failure = []) {
         self.failure = failure
     }
     
