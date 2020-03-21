@@ -46,7 +46,7 @@ public final class CoreDataFeedStore: FeedStore {
                 let request: NSFetchRequest<ManagedCache> = ManagedCache.fetchRequest()
                 request.returnsObjectsAsFaults = false
                 
-                if let cache = try context.fetch(request).first {
+                if let cache = try ManagedCache.find(in: context) {
                     completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
                 } else {
                     completion(.empty)
@@ -108,6 +108,12 @@ private class ManagedCache: NSManagedObject {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<ManagedCache> {
         return NSFetchRequest<ManagedCache>(entityName: "ManagedCache")
     }
+    
+    static func find(in context: NSManagedObjectContext) throws -> ManagedCache? {
+        let request: NSFetchRequest<ManagedCache> = fetchRequest()
+         request.returnsObjectsAsFaults = false
+         return try context.fetch(request).first
+     }
 }
 
 @objc(ManagedFeedImage)
