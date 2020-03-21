@@ -144,13 +144,13 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
 	func test_insert_deliversErrorOnInsertionError() {
-        let sut = FailableFeedStoreStub()
+        let sut = FeedStoreStub()
 
 		assertThatInsertDeliversErrorOnInsertionError(on: sut)
 	}
 
 	func test_insert_hasNoSideEffectsOnInsertionError() {
-        let sut = FailableFeedStoreStub(failure: [.insert])
+        let sut = FeedStoreStub(failure: [.insert])
 
 		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
 	}
@@ -173,7 +173,7 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 //
 //}
 
-private class FailableFeedStoreStub: FeedStore {
+private class FeedStoreStub: FeedStore {
     enum Error: Swift.Error {
         case couldNotDelete
         case couldNotInsert
