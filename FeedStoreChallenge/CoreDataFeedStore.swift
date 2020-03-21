@@ -22,11 +22,50 @@ public final class CoreDataFeedStore: FeedStore {
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        let context = self.context
         
+        context.perform {
+            do {
+                let managedCache = ManagedCache(context: context)
+                managedCache.timestamp = timestamp
+                
+                let managedFeed: [ManagedFeedImage] = feed.map {
+                    let managed = ManagedFeedImage(context: context)
+                    managed.id = $0.id
+                    managed.imageDescription = $0.description
+                    managed.location = $0.location
+                    managed.url = $0.url
+                    return managed
+                }
+                managedCache.feed = NSOrderedSet(array: managedFeed)
+                
+                try context.save()
+                completion(nil)
+            } catch {
+                completion(error)
+            }
+        }
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        completion(.empty)
+        let context = self.context
+        
+        context.perform {
+            do {
+                let request: NSFetchRequest<ManagedCache> = ManagedCache.fetchRequest()
+                request.returnsObjectsAsFaults = false
+                
+                if let cache = try context.fetch(request).first {
+                    let localFeed = cache.feed.compactMap { $0 as? ManagedFeedImage }.map { LocalFeedImage(id: $0.id, description: $0.imageDescription, location: $0.location, url: $0.url) }
+                    
+                    completion(.found(feed: localFeed, timestamp: cache.timestamp))
+                } else {
+                    completion(.empty)
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }
     }
 }
 
@@ -72,6 +111,10 @@ extension NSManagedObjectModel {
 private class ManagedCache: NSManagedObject {
     @NSManaged public var timestamp: Date
     @NSManaged public var feed: NSOrderedSet
+    
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<ManagedCache> {
+        return NSFetchRequest<ManagedCache>(entityName: "ManagedCache")
+    }
 }
 
 @objc(ManagedFeedImage)

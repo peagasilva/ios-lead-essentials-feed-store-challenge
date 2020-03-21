@@ -12,6 +12,14 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 //   Uncomment the test implementations one by one.
 // 	 Follow the process: Make the test pass, commit, and move to the next one.
 //
+    
+    private lazy var feedStoreURL = URL(fileURLWithPath: "dev/null")
+    
+    override func tearDown() {
+        try? FileManager.default.removeItem(at: feedStoreURL)
+        
+        super.tearDown()
+    }
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
 		let sut = makeSUT()
@@ -26,9 +34,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 
 	func test_retrieve_deliversFoundValuesOnNonEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
 	}
 
 	func test_retrieve_hasNoSideEffectsOnNonEmptyCache() {
@@ -89,7 +97,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
         let feedStoreBundle = Bundle(for: CoreDataFeedStore.self)
-        let feedStoreURL = URL(fileURLWithPath: "dev/null")
+//        let feedStoreURL = URL(fileURLWithPath: "dev/null")
         let sut = try! CoreDataFeedStore(url: feedStoreURL, bundle: feedStoreBundle)
         trackMemoryLeaksFor(sut, file: file, line: line)
         return sut
