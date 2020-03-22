@@ -6,14 +6,6 @@ import XCTest
 import FeedStoreChallenge
 
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
-    
-    private lazy var feedStoreURL = URL(fileURLWithPath: "dev/null")
-    
-    override func tearDown() {
-        try? FileManager.default.removeItem(at: feedStoreURL)
-        
-        super.tearDown()
-    }
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
 		let sut = makeSUT()
@@ -90,7 +82,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// MARK: - Helpers
 	
     private func makeSUT(url: URL? = nil, file: StaticString = #file, line: UInt = #line) -> FeedStore {
-        let storeURL = url ?? feedStoreURL
+        let storeURL = url ?? URL(fileURLWithPath: "/dev/null")
         let feedStoreBundle = Bundle(for: CoreDataFeedStore.self)
         let sut = try! CoreDataFeedStore(url: storeURL, bundle: feedStoreBundle)
         trackMemoryLeaksFor(sut, file: file, line: line)
@@ -102,28 +94,18 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
             XCTAssertNil(instance, "Instance should have been deallocated. Potenteial memory leak.", file: file, line: line)
         }
     }
-    
-    private func testSpecificStoreURL() -> URL {
-        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
-    }
 }
 
 extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 
 	func test_retrieve_deliversFailureOnRetrievalError() {
-        let url = feedStoreURL
-        let sut = makeSUT(url: url)
-        
-        try! "invalid data".write(to: url, atomically: false, encoding: .utf8)
+        let sut = FeedStoreStub(failure: [.retrieve])
 
 		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
 	}
 
 	func test_retrieve_hasNoSideEffectsOnFailure() {
-		let url = feedStoreURL
-        let sut = makeSUT(url: url)
-        
-        try! "invalid data".write(to: url, atomically: false, encoding: .utf8)
+        let sut = FeedStoreStub(failure: [.retrieve])
 
 		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
 	}
